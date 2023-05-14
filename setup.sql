@@ -30,19 +30,34 @@ create table complaint (
     data text
   )
 
-
-  create table purchase(
+  create table users (
     id bigserial primary key,
+    firstname text,
+    lastname text,
     username text,
-    purchase_date timestamp default current_timestamp,
+    email text,
+    password text,
+    role int,
+    rolename text default 'user',
+    phone text,
+    address text,
+    ward int,
+    gender int,
+    dob text
 
   )
 
-  create table purchase_item(
-    id bigserial primary key,
-    purchase_id bigint not null references purchase on delete cascade,
-    name text not null,
-   
-    price numeric not null
 
-  )
+create table complaint(
+  id bigserial primary key,
+  user_id bigint not null references users on delete cascade,
+  title text ,
+  description text,
+  status text default 'pending',
+  address text,
+  ward int,
+  category text,
+  image text,
+  priority text default 'low',
+  created_at timestamp default current_timestamp,
+)

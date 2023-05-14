@@ -1,21 +1,60 @@
 import pool from "../db.js";
 import generateToken from "../utils/generateToken.js";
-const createUsers = (req, res, next) => {
-  const { name, email, password, location, ward, dob } = req.body;
-  pool.query(
-    "INSERT INTO public (name, email , password, location, ward, dob) VALUES ($1, $2, $3, $4, $5, $6)",
-    [name, email, password, location, ward, dob],
-    (error, results) => {
-      if (error) {
-        next(error);
-      }
-      res.status(200).json({
-        status: "success",
-        message: "User added sucessfully",
-        data: results.rows,
-      });
-    }
+const createUsers = async (req, res, next) => {
+  const {
+    firstname,
+    lastname,
+    username,
+    email,
+    password,
+    role,
+    phone,
+    address,
+    ward,
+    gender,
+    dob,
+  } = req.body;
+
+  const emailResult = await pool.query("SELECT * FROM users WHERE email=$1", [
+    email,
+  ]);
+
+  const usernameResult = await pool.query(
+    "SELECT * FROM users WHERE username=$1",
+    [username]
   );
+
+  if (emailResult.rowCount == 0 && usernameResult.rowCount == 0) {
+    pool.query(
+      "INSERT INTO users (firstname, lastname, username ,email, password,role,phone, address, ward,gender, dob) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10,$11)",
+      [
+        firstname,
+        lastname,
+        username,
+        email,
+        password,
+        role,
+        phone,
+        address,
+        ward,
+        gender,
+        dob,
+      ],
+      (error, results) => {
+        if (error) {
+          next(error);
+        }
+        res.status(200).json({
+          status: "success",
+          message: "User added sucessfully",
+          data: results.rows,
+        });
+      }
+    );
+  } else {
+    res.status(400);
+    next("Email or username already exists");
+  }
 };
 
 const login = async (req, res, next) => {
@@ -24,7 +63,7 @@ const login = async (req, res, next) => {
     res.status(400);
     next("Please provide email or password");
   } else {
-    const result = await pool.query("SELECT * FROM public WHERE email=$1", [
+    const result = await pool.query("SELECT * FROM users WHERE email=$1", [
       email,
     ]);
     if (result.rowCount === 0) {
@@ -40,9 +79,10 @@ const login = async (req, res, next) => {
         const token = generateToken(result.rows[0].id);
 
         res.json({
-          username: result.rows[0].name,
+          username: result.rows[0].username,
           email: result.rows[0].email,
           token: token,
+          role: result.rows[0].role,
           //   password: result.rows[0].password,
         });
       }
@@ -51,13 +91,29 @@ const login = async (req, res, next) => {
 };
 
 const getUsers = (req, res, next) => {
-  pool.query("SELECT * FROM public", (error, results) => {
-    if (error) {
-      next("Failed to get");
-    } else {
-      res.status(200).json(results.rows);
+  pool.query(
+    "SELECT id,username FROM users where role = 2",
+    (error, results) => {
+      if (error) {
+        next("Failed to get");
+      } else {
+        res.status(200).json(results.rows);
+      }
     }
-  });
+  );
+};
+
+const getMaintainers = (req, res, next) => {
+  pool.query(
+    "SELECT id,username, rolename FROM users where role = 1",
+    (error, results) => {
+      if (error) {
+        next("Failed to get");
+      } else {
+        res.status(200).json(results.rows);
+      }
+    }
+  );
 };
 
 const getUsersById = (req, res, next) => {
@@ -78,7 +134,7 @@ const getUsersById = (req, res, next) => {
 const getUserProfile = async (req, res, next) => {
   const id = req.user.id;
 
-  const result = await pool.query("select * from public where id = $1", [id]);
+  const result = await pool.query("select * from users where id = $1", [id]);
   if (result.rowCount === 0) {
     res.status(404);
     next("User not found");
@@ -86,23 +142,36 @@ const getUserProfile = async (req, res, next) => {
   res.json(result.rows[0]);
 };
 
-const deleteUser = (req, res) => {
-  const id = parseInt(req.params.id);
+// const deleteUser = (req, res) => {
+//   const id = parseInt(req.params.id);
 
-  pool.query("DELETE FROM public WHERE id=$1", [id], (error, results) => {
-    if (error) {
-      console.log(error);
-    }
-    res.status(200).json({ status: "success", message: results.rows.length });
-  });
-};
+//   pool.query("DELETE FROM public WHERE id=$1", [id], (error, results) => {
+//     if (error) {
+//       console.log(error);
+//     }
+//     res.status(200).json({ status: "success", message: results.rows.length });
+//   });
+// };
 
 const updateUser = (req, res, next) => {
-  console.log("id", id);
-  const { name, email, password } = req.body;
+  const id = parseInt(req.params.id);
   pool.query(
-    "UPDATE public SET name=$1, email=$2, password=$3 WHERE id=$4",
-    [name, email, password, id],
+    "UPDATE users SET role=1, rolename = 'Water Maintainer' WHERE id=$1",
+    [id],
+    (error, results) => {
+      if (error) {
+        next(error);
+      }
+      res.status(200).json({ status: "success", message: "User updated" });
+    }
+  );
+};
+
+const updateMaintainer = (req, res, next) => {
+  const id = parseInt(req.params.id);
+  pool.query(
+    "UPDATE users SET role=2, rolename = 'user' WHERE id=$1",
+    [id],
     (error, results) => {
       if (error) {
         next(error);
@@ -122,9 +191,11 @@ export {
   login,
   createUsers,
   getUsers,
-  deleteUser,
+  // deleteUser,
   getUsersById,
   updateUser,
+  updateMaintainer,
   getUserProfile,
   logout,
+  getMaintainers,
 };

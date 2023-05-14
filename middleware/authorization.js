@@ -11,7 +11,7 @@ const protect = async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const result = await pool.query("select * from public where id = $1", [
+      const result = await pool.query("select * from users where id = $1", [
         decoded.id,
       ]);
       req.user = result.rows[0];
