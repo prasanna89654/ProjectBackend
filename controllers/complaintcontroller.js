@@ -26,7 +26,7 @@ const createComplaint = (req, res, next) => {
 const getOwnComplaint = (req, res, next) => {
   const id = req.user.id;
   pool.query(
-    "select * FROM complaint Where user_id = $1",
+    "select id,title, priority, status FROM complaint Where user_id = $1",
     [id],
     (error, results) => {
       if (error) {
@@ -63,6 +63,34 @@ const deleteComplaint = (req, res, next) => {
       });
     }
   });
+};
+
+const updatePriority = (req, res, next) => {
+  const { id, name } = req.body;
+  pool.query(
+    "UPDATE complaint SET priority= $1 WHERE id=$2",
+    [name, id],
+    (error, results) => {
+      if (error) {
+        next(error);
+      }
+      res.status(200).json({ status: "success", message: "Priority updated" });
+    }
+  );
+};
+
+const updateStatus = (req, res, next) => {
+  const { id, name } = req.body;
+  pool.query(
+    "UPDATE complaint SET status= $1 WHERE id=$2",
+    [name, id],
+    (error, results) => {
+      if (error) {
+        next(error);
+      }
+      res.status(200).json({ status: "success", message: "Status updated" });
+    }
+  );
 };
 
 // const createPurchase = async (req, res, next) => {
@@ -126,4 +154,11 @@ const deleteComplaint = (req, res, next) => {
 //   );
 // };
 
-export { createComplaint, getAllComplaint, getOwnComplaint, deleteComplaint };
+export {
+  createComplaint,
+  getAllComplaint,
+  getOwnComplaint,
+  deleteComplaint,
+  updatePriority,
+  updateStatus,
+};

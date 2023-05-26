@@ -7,6 +7,8 @@ import {
   getAllComplaint,
   getOwnComplaint,
   deleteComplaint,
+  updatePriority,
+  updateStatus,
 } from "../controllers/complaintcontroller.js";
 
 const router = express.Router();
@@ -24,4 +26,10 @@ router.get("/getOwnComplaint", protect, getOwnComplaint);
 
 router.delete("/deleteComplaint/:id", deleteComplaint);
 
+router.post("/updatePriority", updatePriority);
+
+router.post("/updateStatus", updateStatus);
+
 export default router;
+
+
