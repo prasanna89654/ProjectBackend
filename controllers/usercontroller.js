@@ -92,7 +92,7 @@ const login = async (req, res, next) => {
 
 const getUsers = (req, res, next) => {
   pool.query(
-    "SELECT id,username FROM users where role = 2",
+    "SELECT * FROM users",
     (error, results) => {
       if (error) {
         next("Failed to get");
@@ -113,6 +113,20 @@ const getMaintainers = (req, res, next) => {
         res.status(200).json(results.rows);
       }
     }
+  );
+};
+
+const makeAdmin = (req, res, next) => {
+  const id = parseInt(req.params.id);
+  pool.query(
+    "UPDATE users SET role=1, rolename = 'Admin' WHERE id=$1",
+    [id],
+  (error, results) => {
+    if (error) {
+      next(error);
+    }
+    res.status(200).json({ status: "success", message: "User updated" });
+  } 
   );
 };
 
@@ -198,4 +212,5 @@ export {
   getUserProfile,
   logout,
   getMaintainers,
+  makeAdmin
 };

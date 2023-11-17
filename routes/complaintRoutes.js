@@ -9,6 +9,7 @@ import {
   deleteComplaint,
   updatePriority,
   updateStatus,
+  getComplaintStatus
 } from "../controllers/complaintcontroller.js";
 
 const router = express.Router();
@@ -29,6 +30,8 @@ router.delete("/deleteComplaint/:id", deleteComplaint);
 router.post("/updatePriority", updatePriority);
 
 router.post("/updateStatus", updateStatus);
+
+router.get("/getComplaintStatus",protect, getComplaintStatus);
 
 export default router;
 

@@ -1,11 +1,18 @@
 import pool from "../db.js";
 const createComplaint = (req, res, next) => {
   const id = req.user.id;
+let filesv = null;
 
-  const fileBuffer = req.file.buffer;
+  if(req.file !== undefined){
 
-  const filesv = fileBuffer.toString("base64");
-  console.log("entered");
+    const fileBuffer = req.file.buffer;
+
+    filesv = fileBuffer.toString("base64");
+    console.log("entered");
+
+    console.log(filesv);
+  }
+ 
   const { title, description, address, ward, category } = req.body;
   pool.query(
     "INSERT INTO complaint (user_id, title, description, address, ward,category,image) VALUES ($1, $2, $3, $4, $5, $6, $7)",
@@ -26,7 +33,7 @@ const createComplaint = (req, res, next) => {
 const getOwnComplaint = (req, res, next) => {
   const id = req.user.id;
   pool.query(
-    "select id,title, priority, status FROM complaint Where user_id = $1",
+    "select * FROM complaint Where user_id = $1",
     [id],
     (error, results) => {
       if (error) {
@@ -40,7 +47,7 @@ const getOwnComplaint = (req, res, next) => {
 
 const getAllComplaint = (req, res, next) => {
   pool.query(
-    "select  username,created_at, title, description, status, complaint.address, complaint.ward, category,priority, image from complaint inner join users on complaint.user_id = users.id ",
+    "select  username,created_at, complaint.id, title, description, status, complaint.address, complaint.ward, category,priority, image from complaint inner join users on complaint.user_id = users.id ",
     (error, results) => {
       if (error) {
         next(error.message);
@@ -92,6 +99,35 @@ const updateStatus = (req, res, next) => {
     }
   );
 };
+
+const getComplaintStatus = (req, res, next) => {
+  const id = req.user.id;
+  const pending = pool.query(
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'pending'",
+    [id],
+  );
+
+  const hold = pool.query(
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'hold'", [id],
+  );
+
+  const solved = pool.query(
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'completed'", [id],
+  );
+
+  
+  Promise.all([pending, hold, solved]).then((values) => {
+    res.status(200).json({
+      pendingComplaint : values[0].rows[0].count,
+      holdComplaint : values[1].rows[0].count,
+      solvedComplaint : values[2].rows[0].count
+    });
+  });
+
+
+};
+
+
 
 // const createPurchase = async (req, res, next) => {
 //   const { username, items } = req.body;
@@ -161,4 +197,5 @@ export {
   deleteComplaint,
   updatePriority,
   updateStatus,
+  getComplaintStatus
 };

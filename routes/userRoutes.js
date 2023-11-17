@@ -11,6 +11,7 @@ import {
   getUserProfile,
   logout,
   getMaintainers,
+  makeAdmin
 } from "../controllers/usercontroller.js";
 
 const router = express.Router();
@@ -34,5 +35,7 @@ router.post("/login", login);
 router.get("/getUserProfile", protect, getUserProfile);
 
 router.post("/logout", logout);
+
+router.post("/makeAdmin/:id", makeAdmin);
 
 export default router;
