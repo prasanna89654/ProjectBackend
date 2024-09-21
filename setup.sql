@@ -1,63 +1,56 @@
-create table maintainer (
-    id bigserial primary key,
+-- Create the maintainer table
+CREATE TABLE maintainer (
+    id bigserial PRIMARY KEY,
     name text,
     position text,
     description text,
     role text,
     userid bigint
-  )
+);
 
-  create table multi (
-    id bigserial primary key,
+-- Create the multi table
+CREATE TABLE multi (
+    id bigserial PRIMARY KEY,
     name text,
     country text[]
-  )
+);
 
-create table complaint (
-    id bigserial primary key,
-    user_id bigint not null references public on delete cascade,
-    title text not null,
-    description text,
-    status text default 'pending',
-    created_at timestamp default current_timestamp
-  )
-
-
-  create table file (
-    id bigserial primary key,
+-- Create the file table
+CREATE TABLE file (
+    id bigserial PRIMARY KEY,
     name text,
     country text,
     data text
-  )
+);
 
-  create table users (
-    id bigserial primary key,
+-- Create the users table
+CREATE TABLE users (
+    id bigserial PRIMARY KEY,
     firstname text,
     lastname text,
     username text,
     email text,
     password text,
     role int,
-    rolename text default 'user',
+    rolename text DEFAULT 'user',
     phone text,
     address text,
     ward int,
     gender int,
     dob text
+);
 
-  )
-
-
-create table complaint(
-  id bigserial primary key,
-  user_id bigint not null references users on delete cascade,
-  title text ,
-  description text,
-  status text default 'Pending',
-  address text,
-  ward text,
-  category text,
-  image text,
-  priority text default 'Low',
-  created_at timestamp default current_timestamp,
-)
+-- Create the complaint table
+CREATE TABLE complaint (
+    id bigserial PRIMARY KEY,
+    user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title text NOT NULL,
+    description text,
+    status text DEFAULT 'Pending',
+    address text,
+    ward text,
+    category text,
+    image text,
+    priority text DEFAULT 'Low',
+    created_at timestamp DEFAULT current_timestamp
+);
