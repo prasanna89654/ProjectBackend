@@ -1,10 +1,9 @@
 import pool from "../db.js";
 const createComplaint = (req, res, next) => {
   const id = req.user.id;
-let filesv = null;
+  let filesv = null;
 
-  if(req.file !== undefined){
-
+  if (req.file !== undefined) {
     const fileBuffer = req.file.buffer;
 
     filesv = fileBuffer.toString("base64");
@@ -12,7 +11,7 @@ let filesv = null;
 
     console.log(filesv);
   }
- 
+
   const { title, description, address, ward, category } = req.body;
   pool.query(
     "INSERT INTO complaint (user_id, title, description, address, ward,category,image) VALUES ($1, $2, $3, $4, $5, $6, $7)",
@@ -103,31 +102,28 @@ const updateStatus = (req, res, next) => {
 const getComplaintStatus = (req, res, next) => {
   const id = req.user.id;
   const pending = pool.query(
-    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'pending'",
-    [id],
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'Pending'",
+    [id]
   );
 
   const hold = pool.query(
-    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'hold'", [id],
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'Hold'",
+    [id]
   );
 
   const solved = pool.query(
-    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'completed'", [id],
+    "SELECT COUNT(*) FROM complaint WHERE user_id = $1 AND status = 'Completed'",
+    [id]
   );
 
-  
   Promise.all([pending, hold, solved]).then((values) => {
     res.status(200).json({
-      pendingComplaint : values[0].rows[0].count,
-      holdComplaint : values[1].rows[0].count,
-      solvedComplaint : values[2].rows[0].count
+      pendingComplaint: values[0].rows[0].count,
+      holdComplaint: values[1].rows[0].count,
+      solvedComplaint: values[2].rows[0].count,
     });
   });
-
-
 };
-
-
 
 // const createPurchase = async (req, res, next) => {
 //   const { username, items } = req.body;
@@ -197,5 +193,5 @@ export {
   deleteComplaint,
   updatePriority,
   updateStatus,
-  getComplaintStatus
+  getComplaintStatus,
 };

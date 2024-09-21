@@ -32,6 +32,6 @@ async function runSQLScript() {
 }
 
 // Call the function to run the SQL script
-runSQLScript();
+// runSQLScript();
 
 export default pool;
