@@ -16,11 +16,11 @@ app.get("/", (req, res) => {
     res.send("API is running");
     });
 
-app.use("/", userRoutes);
+app.use("/user", userRoutes);
 
-app.use("/", maintainerRoutes);
+app.use("/maintainer", maintainerRoutes);
 
-app.use("/", complaintRoutes);
+app.use("/complaint", complaintRoutes);
 
 app.use(errorHandler);
 
