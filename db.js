@@ -4,11 +4,14 @@ import fs from "fs/promises"; // to read the setup.sql file
 const { Pool } = pkg;
 
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "ComplaintMS",
-  password: "Prasanna@789",
+  user: "cmsdb_owner",
+  host: "ep-delicate-band-a1i0x9c3.ap-southeast-1.aws.neon.tech",
+  database: "cmsdb",
+  password: "O0A9uCDyJbGf",
   port: 5432,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // Function to run the setup.sql script
