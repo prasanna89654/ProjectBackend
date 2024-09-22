@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 const PORT = 3000;
 import dotenv from "dotenv";
-import userRoutes from "./routes/userroutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import maintainerRoutes from "./routes/maintainerRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
